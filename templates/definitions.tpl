@@ -8,7 +8,11 @@ Define resource names
 {{- end }}
 
 {{- define "aws-ecr-credential.namespace" }}
+{{- if .Values.awsSecretNamespaceIsReleaseNamespace }}
+{{- .Release.Namespace -}}
+{{- else }}
 {{- default (printf "%s-ns" .Release.Name) .Values.awsSecretNamespace -}}
+{{- end }}
 {{- end }}
 
 {{- define "aws-ecr-credential.serviceAccount" }}
@@ -23,5 +27,7 @@ Define resource names
 {{- default (printf "%s-cron" .Release.Name) .Values.cronName -}}
 {{- end }}
 
-
+{{- define "aws-ecr-credential.targetNamespace" }}
+{{- .Values.targetNamespace -}}
+{{- end }}
 

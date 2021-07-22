@@ -42,7 +42,7 @@ spec:
                     name: {{ include "aws-ecr-credential.secret" . }}
                     key: AWS_SECRET_ACCESS_KEY
               - name: TARGET_NAMESPACE
-                value: {{ .Values.targetNamespace }}
+                value: {{ include "aws-ecr-credential.targetNamespace" . }}
               - name: TARGET_SECRET
                 value: {{ .Values.targetSecret }}
             command:
