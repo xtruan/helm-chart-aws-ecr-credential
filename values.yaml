@@ -20,6 +20,6 @@ awsSecretNamespaceIsReleaseNamespace: false
 targetNamespace: default
 targetSecret: aws-registry
 
-jobImage: ghcr.io/xtruan/aws-kubectl
+jobImage: ghcr.io/nrel-stratus-iac/aws-kubectl
 jobImageTag: v1.2.0
 
