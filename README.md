@@ -1,16 +1,10 @@
 # aws-ecr-credential
 
-This Chart seemlessly integrate Kubernetes with AWS ECR
+AWS ECR requires a password refreshed every 12 hours in order to pull images. This chart provides a mechanism to integrate Kubernetes with AWS ECR by automating this process.
 
-Simply deploy this chart to your kubernetes cluster and you will be able to pull and run images from your AWS ECR (Elastic Container Registry) in your cluster.
+Simply deploy this chart to your Kubernetes cluster and you will be able to pull and run images from your AWS ECR (Elastic Container Registry) in your cluster.
 
 # Quickstart
-
-Set up a KIND environment and Helm tools with the following script:
-
-```sh
-$ source ./scripts/kind_env.sh
-```
 
 Run the following command to register a shared AWS ECR secret alongside a service account:
 
@@ -32,17 +26,17 @@ $ helm install register-aws-ecr-credential . \
 After running, there should be a secret and a service account:
 ```sh
 kubectl -n my-admin-namespace get secrets,serviceaccounts
-NAME                                    TYPE                                  DATA   AGE
-secret/default-token-7t22j              kubernetes.io/service-account-token   3      53s
-secret/my-aws-secret                    Opaque                                3      24s
-secret/my-refresh-account-token-fq2b6   kubernetes.io/service-account-token   3      24s
+NAME                                        TYPE                                  DATA   AGE
+secret/default-token-7t22j                  kubernetes.io/service-account-token   3      53s
+secret/ecr-credential-secret                Opaque                                3      24s
+secret/ecr-credential-refresh-token-fq2b6   kubernetes.io/service-account-token   3      24s
 
-NAME                                SECRETS   AGE
-serviceaccount/default              1         53s
-serviceaccount/my-refresh-account   1         24s
+NAME                                    SECRETS   AGE
+serviceaccount/default                  1         53s
+serviceaccount/ecr-credential-refresh   1         24s
 ```
 
-Next, create a job+cron to populate the docker registry secret in another namespace:
+Next, create a job+cron to populate the Docker registry secret in another namespace:
 
 ```sh
 $ kubectl create namespace my-user-namespace
@@ -51,7 +45,7 @@ $ helm install refresh-image-pull-secret-for-my-user . \
   --set "awsSecret=ecr-credential-secret" \
   --set "awsSecretNamespace=ecr-credential" \
   --set "refreshAccount=ecr-credential-refresh" \
-  --set "targetSecret=my-image-pull-secret" \
+  --set "targetSecret=ecr-credential-secret" \
   --set "targetNamespace=my-user-namespace"
 ```
 
@@ -64,9 +58,9 @@ job.batch/refresh-image-pull-secret-for-my-user-job   1/1           5s         3
 NAME                                                       SCHEDULE      SUSPEND   ACTIVE   LAST SCHEDULE   AGE
 cronjob.batch/refresh-image-pull-secret-for-my-user-cron   * */8 * * *   False     0        <none>          39s
 $ kubectl -n my-user-namespace get secrets
-NAME                   TYPE                                  DATA   AGE
-default-token-cmp42    kubernetes.io/service-account-token   3      11m
-my-image-pull-secret   kubernetes.io/dockerconfigjson        1      2m34s
+NAME                    TYPE                                  DATA   AGE
+default-token-cmp42     kubernetes.io/service-account-token   3      11m
+ecr-credential-secret   kubernetes.io/dockerconfigjson        1      2m34s
 ```
 
 This image pull secret can then be used in the standard way:
@@ -79,7 +73,7 @@ spec:
   template:
     spec:
       imagePullSecrets:
-      - name: my-image-pull-secret
+      - name: ecr-credential-secret
       containers:
         - name: node
           image: node:latest
