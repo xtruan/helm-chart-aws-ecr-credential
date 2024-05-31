@@ -18,15 +18,15 @@ Run the following command to register a shared AWS ECR secret alongside a servic
 $ export AWS_ECR_REGISTRY=<account>.dkr.ecr.<region>.amazonaws.com
 $ export AWS_ACCESS_KEY_ID=<>
 $ export AWS_SECRET_ACCESS_KEY=<>
-$ kubectl create namespace my-admin-namespace
+$ kubectl create namespace ecr-credential
 $ helm install register-aws-ecr-credential . \
   --set "mode=register" \
   --set-string "aws.ecrRegistry=$AWS_ECR_REGISTRY" \
   --set "aws.accessKeyId=$AWS_ACCESS_KEY_ID" \
   --set "aws.secretAccessKey=$AWS_SECRET_ACCESS_KEY" \
-  --set "awsSecret=my-aws-secret" \
-  --set "awsSecretNamespace=my-admin-namespace" \
-  --set "refreshAccount=my-refresh-account"
+  --set "awsSecret=ecr-credential-secret" \
+  --set "awsSecretNamespace=ecr-credential" \
+  --set "refreshAccount=ecr-credential-refresh"
 ```
 
 After running, there should be a secret and a service account:
@@ -48,9 +48,9 @@ Next, create a job+cron to populate the docker registry secret in another namesp
 $ kubectl create namespace my-user-namespace
 $ helm install refresh-image-pull-secret-for-my-user . \
   --set "mode=refresh" \
-  --set "awsSecret=my-aws-secret" \
-  --set "awsSecretNamespace=my-admin-namespace" \
-  --set "refreshAccount=my-refresh-account" \
+  --set "awsSecret=ecr-credential-secret" \
+  --set "awsSecretNamespace=ecr-credential" \
+  --set "refreshAccount=ecr-credential-account" \
   --set "targetSecret=my-image-pull-secret" \
   --set "targetNamespace=my-user-namespace"
 ```
