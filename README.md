@@ -50,7 +50,7 @@ $ helm install refresh-image-pull-secret-for-my-user . \
   --set "mode=refresh" \
   --set "awsSecret=ecr-credential-secret" \
   --set "awsSecretNamespace=ecr-credential" \
-  --set "refreshAccount=ecr-credential-account" \
+  --set "refreshAccount=ecr-credential-refresh" \
   --set "targetSecret=my-image-pull-secret" \
   --set "targetNamespace=my-user-namespace"
 ```
