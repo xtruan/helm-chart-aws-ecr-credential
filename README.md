@@ -40,7 +40,7 @@ Next, create a job+cron to populate the Docker registry secret in another namesp
 
 ```sh
 $ kubectl create namespace my-user-namespace
-$ helm install refresh-image-pull-secret-for-my-user . \
+$ helm install refresh-image-pull-secret-for-my-user-namespace . \
   --set "mode=refresh" \
   --set "awsSecret=ecr-credential-secret" \
   --set "awsSecretNamespace=ecr-credential" \
